@@ -19,127 +19,110 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class FreeGeoIpServiceTest {
+class IPAPIGeoIpServiceTest {
 
     private static final String TEST_IP = "192.168.1.1";
-    private static final String API_URL = "https://freegeoip.io/json/{ip}";
+    private static final String API_URL = "http://ip-api.com/json/{ip}?fields=country,query";
 
     @Mock
     private RestTemplate restTemplate;
 
+    @Mock 
+    private GeoIpDataMapper geoIpDataMapper;
+
     @InjectMocks
-    private FreeGeoIpService freeGeoIpService;
+    private IPAPIGeoIpService IPAPIGeoIpService;
 
     private GeoIpResponse mockResponse;
-    private GeoIpData mockGeoIpData;
+    private GeoIpData mockGeoIpData; 
 
     @BeforeEach
     void setUp() {
         mockResponse = new GeoIpResponse(
                 TEST_IP,
-                "United States",
-                "California",
-                "San Francisco",
-                "94105",
-                37.7749,
-                -122.4194,
-                "America/Los_Angeles"
+                "United States"
         );
+        mockGeoIpData = new GeoIpData(TEST_IP, "United States");
     }
 
     @Test
     void getGeoIpData_shouldReturnGeoIpData_whenApiReturnsValidResponse() {
-        // Arrange
         when(restTemplate.getForObject(eq(API_URL), eq(GeoIpResponse.class), eq(TEST_IP)))
                 .thenReturn(mockResponse);
+        when(geoIpDataMapper.map(mockResponse)).thenReturn(mockGeoIpData);
 
+        Optional<GeoIpData> result = IPAPIGeoIpService.getGeoIpData(TEST_IP);
 
-        // Act
-        Optional<GeoIpData> result = freeGeoIpService.getGeoIpData(TEST_IP);
-
-        // Assert
         assertTrue(result.isPresent());
         GeoIpData geoIpData = result.get();
-        // Using ReflectionTestUtils to get private fields since there are no getters
         assertEquals(TEST_IP, geoIpData.ip());
         assertEquals("United States", geoIpData.countryName());
     }
 
     @Test
     void getGeoIpData_shouldReturnEmpty_whenApiReturnsNull() {
-        // Arrange
         when(restTemplate.getForObject(eq(API_URL), eq(GeoIpResponse.class), eq(TEST_IP)))
                 .thenReturn(null);
 
-        // Act
-        Optional<GeoIpData> result = freeGeoIpService.getGeoIpData(TEST_IP);
+        Optional<GeoIpData> result = IPAPIGeoIpService.getGeoIpData(TEST_IP);
 
-        // Assert
         assertFalse(result.isPresent());
     }
 
     @Test
     void getGeoIpData_shouldReturnEmpty_whenMappedDataIsNull() {
-        // Arrange
         when(restTemplate.getForObject(eq(API_URL), eq(GeoIpResponse.class), eq(TEST_IP)))
-                .thenReturn(null);
+                .thenReturn(mockResponse); 
+        when(geoIpDataMapper.map(mockResponse)).thenReturn(null);
 
+        Optional<GeoIpData> result = IPAPIGeoIpService.getGeoIpData(TEST_IP);
 
-        // Act
-        Optional<GeoIpData> result = freeGeoIpService.getGeoIpData(TEST_IP);
-
-        // Assert
         assertFalse(result.isPresent());
     }
     
     @Test
     void getGeoIpData_shouldReturnEmpty_whenApiThrowsClientException() {
-        // Arrange
         when(restTemplate.getForObject(eq(API_URL), eq(GeoIpResponse.class), eq(TEST_IP)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "Bad Request"));
 
-        // Act
-        Optional<GeoIpData> result = freeGeoIpService.getGeoIpData(TEST_IP);
+        Optional<GeoIpData> result = IPAPIGeoIpService.getGeoIpData(TEST_IP);
 
-        // Assert
         assertFalse(result.isPresent());
     }
 
     @Test
     void getGeoIpData_shouldReturnEmpty_whenApiThrowsServerException() {
-        // Arrange
         when(restTemplate.getForObject(eq(API_URL), eq(GeoIpResponse.class), eq(TEST_IP)))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error"));
 
-        // Act
-        Optional<GeoIpData> result = freeGeoIpService.getGeoIpData(TEST_IP);
+        Optional<GeoIpData> result = IPAPIGeoIpService.getGeoIpData(TEST_IP);
 
-        // Assert
         assertFalse(result.isPresent());
     }
     
     @Test
     void getGeoIpData_shouldHandleEmptyIpAddress() {
-        // Arrange
         String emptyIp = "";
+        GeoIpResponse localMockResponse = new GeoIpResponse(
+            emptyIp, "CountryForEmpty"
+        );
+        GeoIpData localMockGeoData = new GeoIpData(emptyIp, "CountryForEmpty");
+
         when(restTemplate.getForObject(eq(API_URL), eq(GeoIpResponse.class), eq(emptyIp)))
-                .thenReturn(mockResponse);
+                .thenReturn(localMockResponse);
+        when(geoIpDataMapper.map(localMockResponse)).thenReturn(localMockGeoData);
 
-        // Act
-        Optional<GeoIpData> result = freeGeoIpService.getGeoIpData(emptyIp);
+        Optional<GeoIpData> result = IPAPIGeoIpService.getGeoIpData(emptyIp);
 
-        // Assert
         assertTrue(result.isPresent());
+        assertEquals(emptyIp, result.get().ip());
+        assertEquals("CountryForEmpty", result.get().countryName());
     }
     
     @Test
     void getGeoIpData_shouldHandleNullIpAddress() {
-        // Arrange - this test may fail if the implementation doesn't handle null IPs
-        // The test is included to document expected behavior
-        
-        // Act & Assert
-        assertThrows(NullPointerException.class, () -> {
-            freeGeoIpService.getGeoIpData(null);
+        assertThrows(IllegalArgumentException.class, () -> {
+            IPAPIGeoIpService.getGeoIpData(null);
         });
     }
 }

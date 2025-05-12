@@ -1,21 +1,26 @@
 package tgi.ecomplain.infrastructure.complain;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tgi.ecomplain.domain.complain.ComplainRepository;
 import tgi.ecomplain.domain.complain.model.Complain;
 import tgi.ecomplain.domain.complain.model.Client;
+import tgi.ecomplain.infrastructure.complain.mapper.ComplainMapper;
+import tgi.ecomplain.domain.complain.ComplainStatus;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class ComplainRepositoryImpl implements ComplainRepository {
 
     private final JpaComplainRepository jpaComplainRepository;
     private final JpaClientRepository jpaClientRepository;
+    private final ComplainMapper infraComplainMapper;
 
-    public ComplainRepositoryImpl(JpaComplainRepository jpaComplainRepository, JpaClientRepository jpaClientRepository) {
-        this.jpaComplainRepository = jpaComplainRepository;
-        this.jpaClientRepository = jpaClientRepository;
-    }
 
     @Override
     public Complain saveComplain(Complain complain) {
@@ -36,6 +41,7 @@ public class ComplainRepositoryImpl implements ComplainRepository {
                 .client(clientEntity)
                 .country(complain.country())
                 .counter(complain.counter())
+                .status(complain.status() != null ? ComplainStatus.valueOf(complain.status()) : ComplainStatus.SUBMITTED)
                 .build();
 
         // Save the entity
@@ -43,7 +49,7 @@ public class ComplainRepositoryImpl implements ComplainRepository {
 
         // Map back to domain model
         return Complain.builder()
-                .complainId(savedEntity.getId().intValue())
+                .complainId(savedEntity.getId())
                 .message(savedEntity.getMessage())
                 .creationDate(savedEntity.getCreationDate())
                 .client(Client.builder()
@@ -51,8 +57,27 @@ public class ComplainRepositoryImpl implements ComplainRepository {
                         .lastName(savedEntity.getClient().getLastName())
                         .email(savedEntity.getClient().getEmail())
                         .build())
+                .status(savedEntity.getStatus().getValue())
                 .country(savedEntity.getCountry())
                 .counter(savedEntity.getCounter())
                 .build();
+    }
+
+    @Override
+    public List<Complain> findComplainsByEmail(String email) {
+        ClientEntity clientEntity = jpaClientRepository.findByEmail(email);
+        if (clientEntity == null) {
+            return Collections.emptyList();
+        }
+        List<ComplainEntity> complainEntities = jpaComplainRepository.findByClient(clientEntity);
+        return complainEntities.stream()
+                .map(infraComplainMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<Complain> findById(Long id) {
+        return jpaComplainRepository.findById(id)
+                .map(infraComplainMapper::toDomain);
     }
 }

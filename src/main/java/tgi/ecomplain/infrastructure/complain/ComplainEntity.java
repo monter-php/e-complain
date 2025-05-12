@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tgi.ecomplain.domain.complain.ComplainStatus;
 
 import java.util.Date;
 
@@ -26,6 +27,10 @@ public class ComplainEntity {
     @Column(name = "creation_date", nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date creationDate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ComplainStatus status;
     
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "client_id", nullable = false)

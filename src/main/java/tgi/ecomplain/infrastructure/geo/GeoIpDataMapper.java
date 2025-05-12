@@ -1,13 +1,13 @@
 package tgi.ecomplain.infrastructure.geo;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.Mapping;
 import tgi.ecomplain.domain.geo.GeoIpData;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface GeoIpDataMapper {
 
-    GeoIpDataMapper INSTANCE = Mappers.getMapper(GeoIpDataMapper.class);
-
+    @Mapping(target = "countryName", source = "country")
+    @Mapping(target = "ip", source = "query")
     GeoIpData map(GeoIpResponse response);
 }

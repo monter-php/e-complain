@@ -7,7 +7,15 @@ spring:
     username: 'postgres'
     password: 'postgres'
   jpa:
+    generate-ddl: true
+    show-sql: true
     hibernate:
-      ddl-auto: 'update'
+      ddl-auto: 'validate'
     properties:
       dialect: 'org.hibernate.dialect.PostgreSQLDialect'
+      jakarta:
+        persistence:
+          schema-generation:
+            scripts:
+              action: 'create'
+              create-target: 'src/main/resources/schema.sql'
