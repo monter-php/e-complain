@@ -17,5 +17,5 @@ spring:
         persistence:
           schema-generation:
             scripts:
-              action: 'create'
+              action: 'validate'
               create-target: 'src/main/resources/schema.sql'
