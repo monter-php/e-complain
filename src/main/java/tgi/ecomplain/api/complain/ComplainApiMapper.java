@@ -12,12 +12,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ComplainApiMapper {
 
-    @Mapping(target = "clientEmail", source = "email")
-    @Mapping(target = "clientFirstName", source = "firstName")
-    @Mapping(target = "clientLastName", source = "lastName")
-    @Mapping(target = "country", ignore = true)
-    UpdateComplainDTO toUpdateComplainDTO(ComplainRequest request);
-
     @Mapping(target = "complainId", source = "complainId")
     @Mapping(target = "status", source = "status")
     @Mapping(target = "counter", source = "counter")

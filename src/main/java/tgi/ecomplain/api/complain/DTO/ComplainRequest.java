@@ -1,4 +1,12 @@
 package tgi.ecomplain.api.complain.DTO;
 
-public record ComplainRequest(String message, String email, String firstName, String lastName, String ip) {
+import jakarta.validation.constraints.NotBlank;
+
+public record ComplainRequest(
+        @NotBlank String productId,
+        @NotBlank String message,
+        @NotBlank String email,
+        @NotBlank String firstName,
+        @NotBlank String lastName,
+        String ip) {
 }

@@ -13,9 +13,9 @@ spring:
       ddl-auto: 'validate'
     properties:
       dialect: 'org.hibernate.dialect.PostgreSQLDialect'
-      jakarta:
-        persistence:
-          schema-generation:
-            scripts:
-              action: 'validate'
-              create-target: 'src/main/resources/schema.sql'
+#      jakarta:
+#        persistence:
+#          schema-generation:
+#            scripts:
+#              action: 'none'
+#              create-target: 'src/main/resources/schema.sql'

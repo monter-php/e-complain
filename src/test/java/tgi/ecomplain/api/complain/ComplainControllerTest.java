@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import tgi.ecomplain.api.complain.DTO.ComplainRequest;
 import tgi.ecomplain.api.complain.DTO.ComplainResponse;
 import tgi.ecomplain.api.complain.DTO.EmailRequest;
 import tgi.ecomplain.api.complain.DTO.PatchComplainRequest;
+import tgi.ecomplain.application.EcomplainApplication;
 import tgi.ecomplain.domain.complain.ComplainNotFoundException;
 import tgi.ecomplain.domain.complain.ComplainService;
 import tgi.ecomplain.domain.complain.ComplainStatus;
@@ -20,14 +22,15 @@ import tgi.ecomplain.domain.complain.model.Complain;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = ComplainController.class)
+
+@ActiveProfiles("test")
+@SpringBootTest(classes = EcomplainApplication.class)
 @AutoConfigureMockMvc
 class ComplainControllerTest {
 
@@ -57,17 +60,19 @@ class ComplainControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.complainId").value(1L))
-                .andExpect(jsonPath("$.message").value("Test Complain"));
+                .andExpect(jsonPath("$.status").value("SUBMITTED"));
     }
 
     @Test
     void createComplain_shouldReturnBadRequest_whenRequestIsInvalid() throws Exception {
-        ComplainRequest request = new ComplainRequest("", "", "", "", ""); // Invalid request
+        ComplainRequest request = new ComplainRequest("", "", "John", "Doe", "127.0.0.1"); // Invalid: message and email are blank
 
         mockMvc.perform(post("/api/v1/complains")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("must not be blank"))
+                .andExpect(jsonPath("$.email").value("must not be blank"));
     }
 
     @Test

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,15 +40,14 @@ public class ComplainController {
             @ApiResponse(responseCode = "400", description = "Invalid request payload")
     })
     @PostMapping
-    public ResponseEntity<ComplainResponse> createComplain(@RequestBody ComplainRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<ComplainResponse> createComplain(@Valid @RequestBody ComplainRequest complainRequest, HttpServletRequest httpServletRequest) {
 
         String clientIp = httpServletRequest.getHeader("X-Forwarded-For");
         if (clientIp == null || clientIp.isEmpty() || "unknown".equalsIgnoreCase(clientIp)) {
             clientIp = httpServletRequest.getRemoteAddr();
         }
 
-        Complain createdComplain = complainService.createComplain(request, clientIp);
-
+        Complain createdComplain = complainService.createComplain(complainRequest, clientIp);
         ComplainResponse response = complainMapper.toComplainResponse(createdComplain);
 
         URI location = ServletUriComponentsBuilder
@@ -66,7 +66,7 @@ public class ComplainController {
     @PostMapping("/by-email")
     public ResponseEntity<List<ComplainResponse>> getComplainsByEmail(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body containing the email address", required = true, content = @Content(schema = @Schema(implementation = EmailRequest.class)))
-            @org.springframework.web.bind.annotation.RequestBody EmailRequest emailRequest) {
+            @Valid @org.springframework.web.bind.annotation.RequestBody EmailRequest emailRequest) {
         List<Complain> complains = complainService.getComplainsByEmail(emailRequest.email());
         List<ComplainResponse> response = complainMapper.toComplainResponseList(complains);
         return ResponseEntity.ok(response);
@@ -82,7 +82,7 @@ public class ComplainController {
             @Parameter(description = "ID of the complain to be updated", required = true)
             @PathVariable Long complainId,
             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Complain data to update. Only fields present will be updated.", required = true, content = @Content(schema = @Schema(implementation = PatchComplainRequest.class)))
-            @RequestBody PatchComplainRequest patchRequest) {
+            @Valid @RequestBody PatchComplainRequest patchRequest) {
         Complain updatedComplain = complainService.updateComplain(complainId, patchRequest);
         ComplainResponse response = complainMapper.toComplainResponse(updatedComplain);
         return ResponseEntity.ok(response);

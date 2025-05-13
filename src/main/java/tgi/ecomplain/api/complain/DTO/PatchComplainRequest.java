@@ -1,16 +1,20 @@
 package tgi.ecomplain.api.complain.DTO;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tgi.ecomplain.api.complain.validation.ValidComplainStatus;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PatchComplainRequest {
-    private String status; // Will be mapped to ComplainStatus enum
+    @NotBlank
+    @ValidComplainStatus
+    private String status;
     private String message;
     private String country;
 }
