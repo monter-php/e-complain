@@ -37,6 +37,7 @@ public class ComplainService {
         
         // Create and save the complain
         Complain complain = Complain.builder()
+            .productId(request.productId())
             .message(request.message())
             .creationDate(new Date())
             .client(client)

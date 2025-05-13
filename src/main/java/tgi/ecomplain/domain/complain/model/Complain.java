@@ -5,5 +5,5 @@ import lombok.Builder;
 import java.util.Date;
 
 @Builder
-public record Complain(Long complainId, String message, Date creationDate, String status, Client client, String country, int counter) {
+public record Complain(Long complainId, String productId, String message, Date creationDate, String status, Client client, String country, int counter) {
 }

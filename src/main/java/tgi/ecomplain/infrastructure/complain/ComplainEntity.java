@@ -22,6 +22,9 @@ public class ComplainEntity {
     private Long id;
     
     @Column(nullable = false)
+    private String productId;
+    
+    @Column(nullable = false)
     private String message;
     
     @Column(name = "creation_date", nullable = false)

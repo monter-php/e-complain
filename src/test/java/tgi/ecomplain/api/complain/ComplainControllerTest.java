@@ -47,7 +47,7 @@ class ComplainControllerTest {
 
     @Test
     void createComplain_shouldReturnCreated_whenComplainIsCreatedSuccessfully() throws Exception {
-        ComplainRequest request = new ComplainRequest("Test Complain", "john.doe@example.com", "John", "Doe", "127.0.0.1");
+        ComplainRequest request = new ComplainRequest("PID123", "Test Complain", "john.doe@example.com", "John", "Doe", "127.0.0.1");
         Complain createdComplain = Complain.builder().complainId(1L).build();
         ComplainResponse response = new ComplainResponse(1L, "SUBMITTED", 1);
 
@@ -65,7 +65,7 @@ class ComplainControllerTest {
 
     @Test
     void createComplain_shouldReturnBadRequest_whenRequestIsInvalid() throws Exception {
-        ComplainRequest request = new ComplainRequest("", "", "John", "Doe", "127.0.0.1"); // Invalid: message and email are blank
+        ComplainRequest request = new ComplainRequest("PID123", "", "", "John", "Doe", "127.0.0.1"); // Invalid: message and email are blank
 
         mockMvc.perform(post("/api/v1/complains")
                         .contentType(MediaType.APPLICATION_JSON)
