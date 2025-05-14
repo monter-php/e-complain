@@ -47,7 +47,7 @@ class ComplainControllerTest {
 
     @Test
     void createComplain_shouldReturnCreated_whenComplainIsCreatedSuccessfully() throws Exception {
-        ComplainRequest request = new ComplainRequest("PID123", "Test Complain", "john.doe@example.com", "John", "Doe", "127.0.0.1");
+        ComplainRequest request = new ComplainRequest("PID123", "Test Complain", "john.doe@example.com", "John", "Doe");
         Complain createdComplain = Complain.builder().complainId(1L).build();
         ComplainResponse response = new ComplainResponse(1L, "SUBMITTED", 1);
 
@@ -65,7 +65,7 @@ class ComplainControllerTest {
 
     @Test
     void createComplain_shouldReturnBadRequest_whenRequestIsInvalid() throws Exception {
-        ComplainRequest request = new ComplainRequest("PID123", "", "", "John", "Doe", "127.0.0.1"); // Invalid: message and email are blank
+        ComplainRequest request = new ComplainRequest("PID123", "", "", "John", "Doe"); // Invalid: message and email are blank
 
         mockMvc.perform(post("/api/v1/complains")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -159,7 +159,7 @@ class ComplainControllerTest {
 
     @Test
     void createComplain_shouldIncrementCounter_whenComplainExistsForSameProductAndEmail() throws Exception {
-        ComplainRequest request = new ComplainRequest("PROD_XYZ", "Initial complain message", "duplicate@example.com", "John", "Doe", "192.168.1.10");
+        ComplainRequest request = new ComplainRequest("PROD_XYZ", "Initial complain message", "duplicate@example.com", "John", "Doe");
 
         // First call: new complain
         Complain complainFirstCall = Complain.builder()
@@ -199,7 +199,7 @@ class ComplainControllerTest {
 
         // Perform second POST request with the same details
         // (productId and email are the key for identifying existing complain)
-        ComplainRequest sameDetailsRequest = new ComplainRequest("PROD_XYZ", "Another message for same complain", "duplicate@example.com", "John", "Doe", "192.168.1.11"); // IP or message can be different
+        ComplainRequest sameDetailsRequest = new ComplainRequest("PROD_XYZ", "Another message for same complain", "duplicate@example.com", "John", "Doe"); // IP or message can be different
 
         mockMvc.perform(post("/api/v1/complains")
                         .contentType(MediaType.APPLICATION_JSON)

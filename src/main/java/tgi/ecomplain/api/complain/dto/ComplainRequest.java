@@ -7,6 +7,5 @@ public record ComplainRequest(
         @NotBlank String message,
         @NotBlank String email,
         @NotBlank String firstName,
-        @NotBlank String lastName,
-        String ip) {
+        @NotBlank String lastName) {
 }
