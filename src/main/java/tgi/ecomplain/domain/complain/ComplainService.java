@@ -65,11 +65,17 @@ public class ComplainService {
         return complainRepository.findComplainsByEmail(email);
     }
 
+    public Complain getComplainById(Long id) {
+        return complainRepository.findById(id)
+                .orElseThrow(() -> new ComplainNotFoundException(id));
+    }
+
     public Complain updateComplain(Long complainId, PatchComplainRequest patchRequest) {
         Complain existingComplain = complainRepository.findById(complainId)
                 .orElseThrow(() -> new ComplainNotFoundException(complainId));
 
         Complain.ComplainBuilder updatedComplainBuilder = Complain.builder()
+                .productId(existingComplain.getProductId())
                 .complainId(existingComplain.getComplainId())
                 .creationDate(existingComplain.getCreationDate())
                 .client(existingComplain.getClient())
@@ -101,4 +107,3 @@ public class ComplainService {
         return complainRepository.saveComplain(updatedComplain);
     }
 }
-

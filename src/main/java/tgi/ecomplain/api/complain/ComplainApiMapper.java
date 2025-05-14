@@ -2,6 +2,7 @@ package tgi.ecomplain.api.complain;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import tgi.ecomplain.api.complain.dto.ComplainDetailResponse;
 import tgi.ecomplain.api.complain.dto.ComplainResponse;
 import tgi.ecomplain.domain.complain.model.Complain;
 
@@ -16,4 +17,6 @@ public interface ComplainApiMapper {
     ComplainResponse toComplainResponse(Complain complain);
 
     List<ComplainResponse> toComplainResponseList(List<Complain> complains);
+
+    ComplainDetailResponse toComplainDetailsResponse(Complain complain);
 }

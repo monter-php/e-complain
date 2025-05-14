@@ -9,6 +9,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import com.jayway.jsonpath.JsonPath;
+import tgi.ecomplain.api.complain.dto.ClientResponse;
+import tgi.ecomplain.api.complain.dto.ComplainDetailResponse;
 import tgi.ecomplain.api.complain.dto.ComplainRequest;
 import tgi.ecomplain.api.complain.dto.ComplainResponse;
 import tgi.ecomplain.api.complain.dto.SearchByEmailRequest;
@@ -17,17 +21,23 @@ import tgi.ecomplain.application.EcomplainApplication;
 import tgi.ecomplain.domain.complain.ComplainNotFoundException;
 import tgi.ecomplain.domain.complain.ComplainService;
 import tgi.ecomplain.domain.complain.ComplainStatus;
+import tgi.ecomplain.domain.complain.model.Client;
 import tgi.ecomplain.domain.complain.model.Complain;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = EcomplainApplication.class)
@@ -209,5 +219,76 @@ class ComplainControllerTest {
                 .andExpect(jsonPath("$.complainId").value(1L)) // Same complain ID
                 .andExpect(jsonPath("$.status").value(ComplainStatus.SUBMITTED.getValue())) // Status might remain same or update
                 .andExpect(jsonPath("$.counter").value(2)); // Counter incremented
+    }
+
+    @Test
+    void getComplainById_shouldReturnOk_whenComplainExists() throws Exception {
+        Long complainId = 1L;
+        String productId = "PROD123";
+        String message = "Test complain message";
+        Date creationDate = new Date();
+        String country = "Wonderland";
+        Client client = Client.builder()
+                .firstName("John")
+                .lastName("Doe")
+                .email("john.doe@example.com")
+                .build();
+
+        Complain complain = Complain.builder()
+                .complainId(complainId)
+                .productId(productId)
+                .message(message)
+                .creationDate(creationDate)
+                .status(ComplainStatus.SUBMITTED.getValue())
+                .client(client)
+                .country(country)
+                .counter(1)
+                .build();
+
+        ClientResponse clientResponse = new ClientResponse(client.firstName(), client.lastName(), client.email());
+        ComplainDetailResponse detailResponse = new ComplainDetailResponse(
+                complainId,
+                productId,
+                message,
+                creationDate,
+                ComplainStatus.SUBMITTED.getValue(),
+                clientResponse,
+                country,
+                1
+        );
+
+        when(complainService.getComplainById(complainId)).thenReturn(complain);
+        when(complainMapper.toComplainDetailsResponse(complain)).thenReturn(detailResponse);
+
+        MvcResult result = mockMvc.perform(get("/api/v1/complains/{complainId}", complainId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.complainId").value(complainId))
+                .andExpect(jsonPath("$.productId").value(productId))
+                .andExpect(jsonPath("$.message").value(message))
+                .andExpect(jsonPath("$.status").value(ComplainStatus.SUBMITTED.getValue()))
+                .andExpect(jsonPath("$.client.firstName").value(client.firstName()))
+                .andExpect(jsonPath("$.client.lastName").value(client.lastName()))
+                .andExpect(jsonPath("$.client.email").value(client.email()))
+                .andExpect(jsonPath("$.country").value(country))
+                .andExpect(jsonPath("$.counter").value(1))
+                .andReturn();
+
+        String responseBody = result.getResponse().getContentAsString();
+        String actualCreationDateString = JsonPath.read(responseBody, "$.creationDate");
+
+        Instant creationInstant = creationDate.toInstant();
+        OffsetDateTime expectedODT = creationInstant.atOffset(ZoneOffset.UTC);
+        OffsetDateTime actualODT = OffsetDateTime.parse(actualCreationDateString);
+
+        assertEquals(expectedODT, actualODT);
+    }
+
+    @Test
+    void getComplainById_shouldReturnNotFound_whenComplainDoesNotExist() throws Exception {
+        Long nonExistentComplainId = 99L;
+        when(complainService.getComplainById(nonExistentComplainId)).thenThrow(new ComplainNotFoundException(nonExistentComplainId));
+
+        mockMvc.perform(get("/api/v1/complains/{complainId}", nonExistentComplainId))
+                .andExpect(status().isNotFound());
     }
 }

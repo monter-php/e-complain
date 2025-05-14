@@ -10,17 +10,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import tgi.ecomplain.api.complain.dto.ComplainRequest;
-import tgi.ecomplain.api.complain.dto.ComplainResponse;
-import tgi.ecomplain.api.complain.dto.SearchByEmailRequest;
-import tgi.ecomplain.api.complain.dto.PatchComplainRequest;
+import tgi.ecomplain.api.complain.dto.*;
 import tgi.ecomplain.domain.complain.ComplainService;
 import tgi.ecomplain.domain.complain.model.Complain;
 
@@ -69,6 +61,19 @@ public class ComplainController {
             @Valid @org.springframework.web.bind.annotation.RequestBody SearchByEmailRequest searchByEmailRequest) {
         List<Complain> complains = complainService.getComplainsByEmail(searchByEmailRequest.email());
         List<ComplainResponse> response = complainMapper.toComplainResponseList(complains);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get complain details by ID", responses = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved complain details", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ComplainDetailResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Complain not found")
+    })
+    @GetMapping("/{complainId}")
+    public ResponseEntity<ComplainDetailResponse> getComplainById(
+            @Parameter(description = "ID of the complain to retrieve", required = true)
+            @PathVariable Long complainId) {
+        Complain updatedComplain = complainService.getComplainById(complainId);
+        ComplainDetailResponse response = complainMapper.toComplainDetailsResponse(updatedComplain); // And here
         return ResponseEntity.ok(response);
     }
 
