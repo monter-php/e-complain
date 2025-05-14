@@ -1,0 +1,25 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: e-complain-docker
+  datasource:
+    url: jdbc:postgresql://ecomplain-db:5432/ecomplain_db
+    username: ecomplain_user
+    password: ecomplain_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # Creates/updates schema. Use 'validate' or flyway/liquibase in production.
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+logging:
+  level:
+    root: INFO
+    tgi.ecomplain: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE

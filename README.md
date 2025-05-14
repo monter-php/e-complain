@@ -33,9 +33,12 @@ A complaint includes the following information:
 
 - Java JDK 21 or later
 - Apache Maven 3.6.3 or later
-- PostgreSQL server (if not using H2)
+- PostgreSQL server (if not using H2 or running with Docker Compose)
+- Docker and Docker Compose (for running with Docker Compose)
 
 ## Installation and Running
+
+### Running locally
 
 1.  **Clone the repository (if applicable) or ensure you are in the project's root directory.**
 
@@ -54,9 +57,33 @@ A complaint includes the following information:
     Once the application is running, the API will typically be available at `http://localhost:8080`.
     The OpenAPI documentation can be accessed at `http://localhost:8080/swagger-ui.html` or `http://localhost:8080/v3/api-docs`.
 
+### Running with Docker Compose
+
+This is the recommended way to run the application along with its PostgreSQL database in a containerized environment.
+
+1.  **Ensure Docker and Docker Compose are installed on your system.**
+
+2.  **Navigate to the project's root directory (where `docker-compose.yml` is located).**
+
+3.  **Start the application and database using Docker Compose:**
+    ```bash
+    docker compose up
+    ```
+    This command will build the application image (if it doesn't exist or has changed) and then start the `ecomplain-app` and `ecomplain-db` services defined in `docker-compose.yml`. The application will be accessible at `http://localhost:8080`.
+
+    To run in detached mode (in the background), use:
+    ```bash
+    docker compose up -d
+    ```
+
+4.  **To stop and remove the containers, network, and volumes created by `docker compose up`:**
+    ```bash
+    docker compose down
+    ```
+
 ## Database Configuration
 
-This application is configured by default to use an H2 in-memory database for ease of development and testing. For production or persistent storage, PostgreSQL is recommended.
+This application is configured by default to use an H2 in-memory database for ease of development and testing. For production or persistent storage, PostgreSQL is recommended. In docker compose, the database is configured to use a PostgreSQL database and no additional configuration is required.
 
 ### PostgreSQL Configuration
 

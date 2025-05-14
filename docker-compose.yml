@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  ecomplain-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ecomplain-app:latest
+    container_name: ecomplain-app
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ecomplain-db:5432/ecomplain_db
+      - SPRING_DATASOURCE_USERNAME=ecomplain_user
+      - SPRING_DATASOURCE_PASSWORD=ecomplain_password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    networks:
+      - ecomplain-network
+    depends_on:
+      - ecomplain-db
+
+  ecomplain-db:
+    image: postgres:16-alpine
+    container_name: ecomplain-db
+    environment:
+      POSTGRES_DB: ecomplain_db
+      POSTGRES_USER: ecomplain_user
+      POSTGRES_PASSWORD: ecomplain_password
+    volumes:
+      - ecomplain-db-data:/var/lib/postgresql/data
+    networks:
+      - ecomplain-network
+
+networks:
+  ecomplain-network:
+    driver: bridge
+
+volumes:
+  ecomplain-db-data:
