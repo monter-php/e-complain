@@ -1,3 +1,15 @@
 spring:
   application:
     name: 'ecomplain'
+  datasource:
+    driverClassName: 'org.postgresql.Driver'
+    url: "jdbc:postgresql://localhost:5432/ecomplain"
+    username: 'postgres'
+    password: 'postgres'
+  jpa:
+    generate-ddl: true
+    show-sql: true
+    hibernate:
+      ddl-auto: 'validate'
+    properties:
+      dialect: 'org.hibernate.dialect.PostgreSQLDialect'

@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: 'ecomplain'
+  datasource:
+    driverClassName: 'org.postgresql.Driver'
+    url: "jdbc:postgresql://localhost:5432/ecomplain"
+    username: 'postgres'
+    password: 'postgres'
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: 'classpath:db/migration'
+    schemas: 'public'
+logging:
+  level:
+    root: 'WARN'
+    tgi: 'DEBUG'
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
