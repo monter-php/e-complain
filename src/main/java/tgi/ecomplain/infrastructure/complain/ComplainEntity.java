@@ -10,7 +10,10 @@ import tgi.ecomplain.domain.complain.ComplainStatus;
 import java.util.Date;
 
 @Entity
-@Table(name = "complains")
+@Table(name = "complains",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_complain_client_product", columnNames = {"client_id", "product_id"})
+        })
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,7 +24,7 @@ public class ComplainEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
-    @Column(nullable = false)
+    @Column(name = "product_id", nullable = false)
     private String productId;
     
     @Column(nullable = false)

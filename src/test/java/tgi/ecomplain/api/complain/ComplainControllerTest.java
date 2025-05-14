@@ -163,6 +163,7 @@ class ComplainControllerTest {
 
         // First call: new complain
         Complain complainFirstCall = Complain.builder()
+                .productId("PROD_XYZ")
                 .complainId(1L)
                 .status(ComplainStatus.SUBMITTED.getValue())
                 .counter(1)
@@ -171,6 +172,7 @@ class ComplainControllerTest {
 
         // Second call: existing complain, counter incremented
         Complain complainSecondCall = Complain.builder()
+                .productId("PROD_XYZ")
                 .complainId(1L) // Same ID
                 .status(ComplainStatus.SUBMITTED.getValue())
                 .counter(2) // Incremented counter

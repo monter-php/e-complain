@@ -36,20 +36,29 @@ public class ComplainRepositoryImpl implements ComplainRepository {
         }
 
         // Create and save the complain entity
-        ComplainEntity complainEntity = ComplainEntity.builder()
-                .message(complain.getMessage())
-                .creationDate(complain.getCreationDate())
-                .client(clientEntity.get())
-                .country(complain.getCountry())
-                .counter(complain.getCounter())
-                .status(complain.getStatus() != null ? ComplainStatus.valueOf(complain.getStatus()) : ComplainStatus.SUBMITTED)
-                .build();
+        ComplainEntity complainEntity;
+        if(jpaComplainRepository.findOneByProductIdAndClient(complain.getProductId(), clientEntity.get()).isPresent()) {
+            complainEntity = jpaComplainRepository.findOneByProductIdAndClient(complain.getProductId(), clientEntity.get()).get();
+            complainEntity.setCounter(complainEntity.getCounter() + 1);
+        } else {
+            complainEntity = ComplainEntity.builder()
+                    .productId(complain.getProductId())
+                    .message(complain.getMessage())
+                    .creationDate(complain.getCreationDate())
+                    .client(clientEntity.get())
+                    .country(complain.getCountry())
+                    .counter(complain.getCounter())
+                    .status(complain.getStatus() != null ? ComplainStatus.valueOf(complain.getStatus()) : ComplainStatus.SUBMITTED)
+                    .build();
+        }
+
 
         // Save the entity
         ComplainEntity savedEntity = jpaComplainRepository.save(complainEntity);
 
         // Map back to domain model
         return Complain.builder()
+                .productId(savedEntity.getProductId())
                 .complainId(savedEntity.getId())
                 .message(savedEntity.getMessage())
                 .creationDate(savedEntity.getCreationDate())
