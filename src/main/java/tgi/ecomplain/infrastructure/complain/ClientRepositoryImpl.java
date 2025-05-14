@@ -1,25 +1,22 @@
 package tgi.ecomplain.infrastructure.complain;
 
+import java.util.Optional;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tgi.ecomplain.domain.complain.ClientRepository;
 import tgi.ecomplain.domain.complain.model.Client;
 
 @Component
+@RequiredArgsConstructor
 public class ClientRepositoryImpl implements ClientRepository {
 
     private final JpaClientRepository jpaClientRepository;
 
-    public ClientRepositoryImpl(JpaClientRepository jpaClientRepository) {
-        this.jpaClientRepository = jpaClientRepository;
-    }
-
     @Override
     public Client getClient(String email) {
-        ClientEntity clientEntity = jpaClientRepository.findByEmail(email);
-        if (clientEntity == null) {
-            return null;
-        }
-        return mapToDomain(clientEntity);
+        Optional<ClientEntity> clientEntity = jpaClientRepository.findByEmail(email);
+        return clientEntity.map(this::mapToDomain).orElse(null);
     }
 
     @Override

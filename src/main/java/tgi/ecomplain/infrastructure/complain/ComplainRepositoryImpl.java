@@ -21,27 +21,28 @@ public class ComplainRepositoryImpl implements ComplainRepository {
     private final JpaClientRepository jpaClientRepository;
     private final ComplainMapper infraComplainMapper;
 
-
     @Override
     public Complain saveComplain(Complain complain) {
         // Find or create the client entity
-        ClientEntity clientEntity = jpaClientRepository.findByEmail(complain.client().email());
-        if (clientEntity == null) {
-            clientEntity = ClientEntity.builder()
-                    .firstName(complain.client().firstName())
-                    .lastName(complain.client().lastName())
-                    .email(complain.client().email())
-                    .build();
+        Optional<ClientEntity> clientEntity = jpaClientRepository.findByEmail(complain.getClient().email());
+        if (clientEntity.isEmpty()) {
+            clientEntity = Optional.of(
+                ClientEntity.builder()
+                    .firstName(complain.getClient().firstName())
+                    .lastName(complain.getClient().lastName())
+                    .email(complain.getClient().email())
+                    .build()
+            );
         }
 
         // Create and save the complain entity
         ComplainEntity complainEntity = ComplainEntity.builder()
-                .message(complain.message())
-                .creationDate(complain.creationDate())
-                .client(clientEntity)
-                .country(complain.country())
-                .counter(complain.counter())
-                .status(complain.status() != null ? ComplainStatus.valueOf(complain.status()) : ComplainStatus.SUBMITTED)
+                .message(complain.getMessage())
+                .creationDate(complain.getCreationDate())
+                .client(clientEntity.get())
+                .country(complain.getCountry())
+                .counter(complain.getCounter())
+                .status(complain.getStatus() != null ? ComplainStatus.valueOf(complain.getStatus()) : ComplainStatus.SUBMITTED)
                 .build();
 
         // Save the entity
@@ -65,11 +66,11 @@ public class ComplainRepositoryImpl implements ComplainRepository {
 
     @Override
     public List<Complain> findComplainsByEmail(String email) {
-        ClientEntity clientEntity = jpaClientRepository.findByEmail(email);
-        if (clientEntity == null) {
+        Optional<ClientEntity> clientEntity = jpaClientRepository.findByEmail(email);
+        if (clientEntity.isEmpty()) {
             return Collections.emptyList();
         }
-        List<ComplainEntity> complainEntities = jpaComplainRepository.findByClient(clientEntity);
+        List<ComplainEntity> complainEntities = jpaComplainRepository.findByClient(clientEntity.get());
         return complainEntities.stream()
                 .map(infraComplainMapper::toDomain)
                 .collect(Collectors.toList());
@@ -79,5 +80,12 @@ public class ComplainRepositoryImpl implements ComplainRepository {
     public Optional<Complain> findById(Long id) {
         return jpaComplainRepository.findById(id)
                 .map(infraComplainMapper::toDomain);
+    }
+
+    @Override
+    public Optional<Complain> findComplainByProductIdAndEmail(String productId, String email) {
+        Optional<ClientEntity> clientEntity = jpaClientRepository.findByEmail(email);
+        return clientEntity.flatMap(entity -> jpaComplainRepository.findOneByProductIdAndClient(productId, entity)
+                .map(infraComplainMapper::toDomain));
     }
 }

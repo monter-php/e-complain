@@ -10,6 +10,7 @@ import tgi.ecomplain.domain.complain.model.Client;
 import tgi.ecomplain.domain.complain.model.Complain;
 import tgi.ecomplain.domain.complain.ComplainStatus;
 import java.util.Date;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,7 +77,7 @@ class ComplainRepositoryImplTest {
     @Test
     void saveComplain_shouldCreateNewClient_whenClientDoesNotExist() {
         // Arrange
-        when(jpaClientRepository.findByEmail(testClient.email())).thenReturn(null);
+        when(jpaClientRepository.findByEmail(testClient.email())).thenReturn(Optional.empty());
         when(jpaComplainRepository.save(any(ComplainEntity.class))).thenReturn(savedComplainEntity);
 
         // Act
@@ -84,15 +85,15 @@ class ComplainRepositoryImplTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(1, result.complainId());
-        assertEquals(testComplain.message(), result.message());
-        assertEquals(testComplain.creationDate(), result.creationDate());
-        assertEquals(testComplain.client().firstName(), result.client().firstName());
-        assertEquals(testComplain.client().lastName(), result.client().lastName());
-        assertEquals(testComplain.client().email(), result.client().email());
-        assertEquals(testComplain.country(), result.country());
-        assertEquals(testComplain.counter(), result.counter());
-        assertEquals(testComplain.status(), result.status());
+        assertEquals(1, result.getComplainId());
+        assertEquals(testComplain.getMessage(), result.getMessage());
+        assertEquals(testComplain.getCreationDate(), result.getCreationDate());
+        assertEquals(testComplain.getClient().firstName(), result.getClient().firstName());
+        assertEquals(testComplain.getClient().lastName(), result.getClient().lastName());
+        assertEquals(testComplain.getClient().email(), result.getClient().email());
+        assertEquals(testComplain.getCountry(), result.getCountry());
+        assertEquals(testComplain.getCounter(), result.getCounter());
+        assertEquals(testComplain.getStatus(), result.getStatus());
         
         // Verify interactions
         verify(jpaClientRepository).findByEmail(testClient.email());
@@ -102,7 +103,7 @@ class ComplainRepositoryImplTest {
     @Test
     void saveComplain_shouldUseExistingClient_whenClientExists() {
         // Arrange
-        when(jpaClientRepository.findByEmail(testClient.email())).thenReturn(testClientEntity);
+        when(jpaClientRepository.findByEmail(testClient.email())).thenReturn(Optional.of(testClientEntity));
         when(jpaComplainRepository.save(any(ComplainEntity.class))).thenReturn(savedComplainEntity);
 
         // Act
@@ -110,15 +111,15 @@ class ComplainRepositoryImplTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(1, result.complainId());
-        assertEquals(testComplain.message(), result.message());
-        assertEquals(testComplain.creationDate(), result.creationDate());
-        assertEquals(testComplain.client().firstName(), result.client().firstName());
-        assertEquals(testComplain.client().lastName(), result.client().lastName());
-        assertEquals(testComplain.client().email(), result.client().email());
-        assertEquals(testComplain.country(), result.country());
-        assertEquals(testComplain.counter(), result.counter());
-        assertEquals(testComplain.status(), result.status());
+        assertEquals(1, result.getComplainId());
+        assertEquals(testComplain.getMessage(), result.getMessage());
+        assertEquals(testComplain.getCreationDate(), result.getCreationDate());
+        assertEquals(testComplain.getClient().firstName(), result.getClient().firstName());
+        assertEquals(testComplain.getClient().lastName(), result.getClient().lastName());
+        assertEquals(testComplain.getClient().email(), result.getClient().email());
+        assertEquals(testComplain.getCountry(), result.getCountry());
+        assertEquals(testComplain.getCounter(), result.getCounter());
+        assertEquals(testComplain.getStatus(), result.getStatus());
         
         // Verify interactions
         verify(jpaClientRepository).findByEmail(testClient.email());
@@ -131,7 +132,7 @@ class ComplainRepositoryImplTest {
     @Test
     void saveComplain_shouldMapEntityToDomainModel_whenSavingComplain() {
         // Arrange
-        when(jpaClientRepository.findByEmail(testClient.email())).thenReturn(testClientEntity);
+        when(jpaClientRepository.findByEmail(testClient.email())).thenReturn(Optional.of(testClientEntity));
         when(jpaComplainRepository.save(any(ComplainEntity.class))).thenReturn(savedComplainEntity);
 
         // Act
@@ -139,15 +140,15 @@ class ComplainRepositoryImplTest {
 
         // Assert
         assertNotNull(result);
-        assertEquals(savedComplainEntity.getId().intValue(), result.complainId());
-        assertEquals(savedComplainEntity.getMessage(), result.message());
-        assertEquals(savedComplainEntity.getCreationDate(), result.creationDate());
-        assertEquals(savedComplainEntity.getClient().getFirstName(), result.client().firstName());
-        assertEquals(savedComplainEntity.getClient().getLastName(), result.client().lastName());
-        assertEquals(savedComplainEntity.getClient().getEmail(), result.client().email());
-        assertEquals(savedComplainEntity.getCountry(), result.country());
-        assertEquals(savedComplainEntity.getCounter(), result.counter());
-        assertEquals(ComplainStatus.SUBMITTED.getValue(), result.status());
+        assertEquals(savedComplainEntity.getId().intValue(), result.getComplainId());
+        assertEquals(savedComplainEntity.getMessage(), result.getMessage());
+        assertEquals(savedComplainEntity.getCreationDate(), result.getCreationDate());
+        assertEquals(savedComplainEntity.getClient().getFirstName(), result.getClient().firstName());
+        assertEquals(savedComplainEntity.getClient().getLastName(), result.getClient().lastName());
+        assertEquals(savedComplainEntity.getClient().getEmail(), result.getClient().email());
+        assertEquals(savedComplainEntity.getCountry(), result.getCountry());
+        assertEquals(savedComplainEntity.getCounter(), result.getCounter());
+        assertEquals(ComplainStatus.SUBMITTED.getValue(), result.getStatus());
     }
     
     @Test
@@ -164,7 +165,7 @@ class ComplainRepositoryImplTest {
                 .status(ComplainStatus.SUBMITTED)
                 .build();
                 
-        when(jpaClientRepository.findByEmail(testClient.email())).thenReturn(testClientEntity);
+        when(jpaClientRepository.findByEmail(testClient.email())).thenReturn(Optional.of(testClientEntity));
         when(jpaComplainRepository.save(any(ComplainEntity.class))).thenReturn(entityWithNullId);
 
         // Act
@@ -172,14 +173,14 @@ class ComplainRepositoryImplTest {
 
         // Assert
         assertNotNull(result);
-        assertNull(result.complainId()); // ID should be null since entity ID is null
-        assertEquals(testComplain.message(), result.message());
-        assertEquals(testComplain.creationDate(), result.creationDate());
-        assertEquals(testComplain.client().firstName(), result.client().firstName());
-        assertEquals(testComplain.client().lastName(), result.client().lastName());
-        assertEquals(testComplain.client().email(), result.client().email());
-        assertEquals(testComplain.country(), result.country());
-        assertEquals(testComplain.counter(), result.counter());
-        assertEquals(testComplain.status(), result.status());
+        assertNull(result.getComplainId()); // ID should be null since entity ID is null
+        assertEquals(testComplain.getMessage(), result.getMessage());
+        assertEquals(testComplain.getCreationDate(), result.getCreationDate());
+        assertEquals(testComplain.getClient().firstName(), result.getClient().firstName());
+        assertEquals(testComplain.getClient().lastName(), result.getClient().lastName());
+        assertEquals(testComplain.getClient().email(), result.getClient().email());
+        assertEquals(testComplain.getCountry(), result.getCountry());
+        assertEquals(testComplain.getCounter(), result.getCounter());
+        assertEquals(testComplain.getStatus(), result.getStatus());
     }
 }

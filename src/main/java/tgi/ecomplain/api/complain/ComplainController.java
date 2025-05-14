@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import tgi.ecomplain.api.complain.DTO.ComplainRequest;
 import tgi.ecomplain.api.complain.DTO.ComplainResponse;
-import tgi.ecomplain.api.complain.DTO.EmailRequest;
+import tgi.ecomplain.api.complain.DTO.SearchByEmailRequest;
 import tgi.ecomplain.api.complain.DTO.PatchComplainRequest;
 import tgi.ecomplain.domain.complain.ComplainService;
 import tgi.ecomplain.domain.complain.model.Complain;
@@ -53,7 +53,7 @@ public class ComplainController {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(createdComplain.complainId())
+                .buildAndExpand(createdComplain.getComplainId())
                 .toUri();
 
         return ResponseEntity.created(location).body(response);
@@ -65,9 +65,9 @@ public class ComplainController {
     })
     @PostMapping("/by-email")
     public ResponseEntity<List<ComplainResponse>> getComplainsByEmail(
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body containing the email address", required = true, content = @Content(schema = @Schema(implementation = EmailRequest.class)))
-            @Valid @org.springframework.web.bind.annotation.RequestBody EmailRequest emailRequest) {
-        List<Complain> complains = complainService.getComplainsByEmail(emailRequest.email());
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Request body containing the email address", required = true, content = @Content(schema = @Schema(implementation = SearchByEmailRequest.class)))
+            @Valid @org.springframework.web.bind.annotation.RequestBody SearchByEmailRequest searchByEmailRequest) {
+        List<Complain> complains = complainService.getComplainsByEmail(searchByEmailRequest.email());
         List<ComplainResponse> response = complainMapper.toComplainResponseList(complains);
         return ResponseEntity.ok(response);
     }

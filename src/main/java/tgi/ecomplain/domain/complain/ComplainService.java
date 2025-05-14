@@ -1,6 +1,7 @@
 package tgi.ecomplain.domain.complain;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import tgi.ecomplain.api.complain.DTO.ComplainRequest;
 import tgi.ecomplain.api.complain.DTO.PatchComplainRequest;
@@ -15,6 +16,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ComplainService {
     
     private final ComplainRepository complainRepository;
@@ -31,6 +33,16 @@ public class ComplainService {
                 request.lastName()
             );
         }
+
+        Optional<Complain> existingComplain = complainRepository.findComplainByProductIdAndEmail(request.productId(), request.email());
+        if (existingComplain.isPresent()) {
+            log.info("Complain already exists for product {} and email {}", request.productId(), request.email());
+            //increment counter
+            Complain complain = existingComplain.get();
+            complain.setCounter(complain.getCounter() + 1);
+            return complainRepository.saveComplain(complain);
+        }
+            
 
         Optional<GeoIpData> geoIpResponse = geoIpService.getGeoIpData(clientIp);
         String country = geoIpResponse.map(GeoIpData::countryName).orElse("");
@@ -58,10 +70,10 @@ public class ComplainService {
                 .orElseThrow(() -> new ComplainNotFoundException(complainId));
 
         Complain.ComplainBuilder updatedComplainBuilder = Complain.builder()
-                .complainId(existingComplain.complainId())
-                .creationDate(existingComplain.creationDate())
-                .client(existingComplain.client())
-                .counter(existingComplain.counter()); // Preserve original counter unless explicitly updatable
+                .complainId(existingComplain.getComplainId())
+                .creationDate(existingComplain.getCreationDate())
+                .client(existingComplain.getClient())
+                .counter(existingComplain.getCounter()); // Preserve original counter unless explicitly updatable
 
         // Apply updates from patchRequest
         if (patchRequest.getStatus() != null && !patchRequest.getStatus().isBlank()) {
@@ -73,19 +85,19 @@ public class ComplainService {
                 throw new IllegalArgumentException("Invalid status value: " + patchRequest.getStatus());
             }
         } else {
-            updatedComplainBuilder.status(existingComplain.status());
+            updatedComplainBuilder.status(existingComplain.getStatus());
         }
 
         if (patchRequest.getMessage() != null) {
             updatedComplainBuilder.message(patchRequest.getMessage());
         } else {
-            updatedComplainBuilder.message(existingComplain.message());
+            updatedComplainBuilder.message(existingComplain.getMessage());
         }
 
         if (patchRequest.getCountry() != null) {
             updatedComplainBuilder.country(patchRequest.getCountry());
         } else {
-            updatedComplainBuilder.country(existingComplain.country());
+            updatedComplainBuilder.country(existingComplain.getCountry());
         }
 
         Complain updatedComplain = updatedComplainBuilder.build();
