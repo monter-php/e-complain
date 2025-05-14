@@ -47,13 +47,8 @@ A complaint includes the following information:
 3.  **Run the application:**
     You can run the application using the Spring Boot Maven plugin:
     ```bash
-    mvn spring-boot:run
+    mvn spring-boot:run -Dspring-boot.run.profiles=local
     ```
-    Alternatively, you can run the packaged JAR file (after building):
-    ```bash
-    java -jar target/ecomplain-0.0.1-SNAPSHOT.jar
-    ```
-    *(Note: The JAR filename might vary based on the project version in `pom.xml`)*
 
 4.  **Accessing the API:**
     Once the application is running, the API will typically be available at `http://localhost:8080`.
