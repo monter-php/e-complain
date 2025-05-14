@@ -121,8 +121,6 @@ class IPAPIGeoIpServiceTest {
     
     @Test
     void getGeoIpData_shouldHandleNullIpAddress() {
-        assertThrows(IllegalArgumentException.class, () -> {
-            IPAPIGeoIpService.getGeoIpData(null);
-        });
+        assertThrows(IllegalArgumentException.class, () -> IPAPIGeoIpService.getGeoIpData(null));
     }
 }

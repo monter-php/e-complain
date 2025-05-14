@@ -1,4 +1,4 @@
-package tgi.ecomplain.api.complain.DTO;
+package tgi.ecomplain.api.complain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -2,9 +2,7 @@ package tgi.ecomplain.api.complain;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import tgi.ecomplain.api.complain.DTO.ComplainRequest;
-import tgi.ecomplain.api.complain.DTO.ComplainResponse;
-import tgi.ecomplain.api.complain.DTO.UpdateComplainDTO;
+import tgi.ecomplain.api.complain.dto.ComplainResponse;
 import tgi.ecomplain.domain.complain.model.Complain;
 
 import java.util.List;

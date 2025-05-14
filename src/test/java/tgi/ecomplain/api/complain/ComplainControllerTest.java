@@ -9,10 +9,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import tgi.ecomplain.api.complain.DTO.ComplainRequest;
-import tgi.ecomplain.api.complain.DTO.ComplainResponse;
-import tgi.ecomplain.api.complain.DTO.SearchByEmailRequest;
-import tgi.ecomplain.api.complain.DTO.PatchComplainRequest;
+import tgi.ecomplain.api.complain.dto.ComplainRequest;
+import tgi.ecomplain.api.complain.dto.ComplainResponse;
+import tgi.ecomplain.api.complain.dto.SearchByEmailRequest;
+import tgi.ecomplain.api.complain.dto.PatchComplainRequest;
 import tgi.ecomplain.application.EcomplainApplication;
 import tgi.ecomplain.domain.complain.ComplainNotFoundException;
 import tgi.ecomplain.domain.complain.ComplainService;
@@ -150,10 +150,6 @@ class ComplainControllerTest {
     void updateComplain_shouldReturnBadRequest_whenPatchRequestIsInvalid() throws Exception {
         Long complainId = 1L;
         PatchComplainRequest patchRequest = new PatchComplainRequest("INVALID_STATUS", null, null); // Invalid status
-
-        // Mocking the service call is not strictly necessary here as validation should happen before the service
-        // but it's good practice to define the behavior if the service were called.
-        // when(complainService.updateComplain(eq(complainId), any(PatchComplainRequest.class))).thenReturn(null); // Or throw a validation exception if service handles it
 
         mockMvc.perform(put("/api/v1/complains/{complainId}", complainId)
                         .contentType(MediaType.APPLICATION_JSON)

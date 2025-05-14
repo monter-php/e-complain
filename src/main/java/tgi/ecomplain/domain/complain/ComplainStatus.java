@@ -1,5 +1,8 @@
 package tgi.ecomplain.domain.complain;
 
+import lombok.Getter;
+
+@Getter
 public enum ComplainStatus {
     SUBMITTED("SUBMITTED"),
     IN_PROGRESS("IN_PROGRESS"),
@@ -12,10 +15,6 @@ public enum ComplainStatus {
 
     ComplainStatus(String value) {
         this.value = value;
-    }
-
-    public String getValue() {
-        return value;
     }
 
     public static ComplainStatus fromString(String status) {

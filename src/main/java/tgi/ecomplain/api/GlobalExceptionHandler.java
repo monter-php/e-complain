@@ -13,8 +13,8 @@ import tgi.ecomplain.domain.complain.ComplainNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice
 @Slf4j
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     public GlobalExceptionHandler() {

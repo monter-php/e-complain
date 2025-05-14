@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import tgi.ecomplain.api.complain.DTO.ComplainRequest;
-import tgi.ecomplain.api.complain.DTO.ComplainResponse;
-import tgi.ecomplain.api.complain.DTO.SearchByEmailRequest;
-import tgi.ecomplain.api.complain.DTO.PatchComplainRequest;
+import tgi.ecomplain.api.complain.dto.ComplainRequest;
+import tgi.ecomplain.api.complain.dto.ComplainResponse;
+import tgi.ecomplain.api.complain.dto.SearchByEmailRequest;
+import tgi.ecomplain.api.complain.dto.PatchComplainRequest;
 import tgi.ecomplain.domain.complain.ComplainService;
 import tgi.ecomplain.domain.complain.model.Complain;
 

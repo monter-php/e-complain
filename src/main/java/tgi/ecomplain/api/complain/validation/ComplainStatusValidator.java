@@ -22,7 +22,7 @@ public class ComplainStatusValidator implements ConstraintValidator<ValidComplai
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         if (value == null || value.trim().isEmpty()) {
-            return true; // Or false, depending on whether status can be null/empty. Assuming true for now if @NotBlank is handled separately.
+            return false;
         }
         return allowedStatuses.contains(value.toUpperCase());
     }
